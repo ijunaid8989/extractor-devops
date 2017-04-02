@@ -1,0 +1,67 @@
+- name: Source asdf in bashrc
+  lineinfile:
+    line: "source /home/{{user_name}}/.asdf/asdf.sh"
+    dest: "/home/{{user_name}}/.bash_profile"
+    owner: "{{user_name}}"
+    create: yes
+  sudo_user: "{{ user_name }} -i"
+
+- name: Add asdf plugins for Elixir and Erlang
+  command: "bash -lc 'asdf plugin-add {{item}} https://github.com/HashNuke/asdf-{{item}}.git'"
+  with_items:
+    - erlang
+    - elixir
+  failed_when: false
+  sudo_user: "{{ user_name }} -i"
+
+- name: Install Erlang using asdf
+  command: "bash -lc 'asdf install erlang 18.3'"
+  sudo_user: "{{ user_name }} -i"
+
+- name: Set Erlang version using asdf
+  command: "bash -lc 'asdf global erlang 18.3'"
+  sudo_user: "{{ user_name }} -i"
+
+- name: Install Elixir using asdf
+  command: "bash -lc 'asdf install elixir 1.3.1'"
+  sudo_user: "{{ user_name }} -i"
+
+- name: Set Elixir version using asdf
+  command: "bash -lc 'asdf global elixir 1.3.1'"
+  sudo_user: "{{ user_name }} -i"
+
+- name: Install hex
+  shell: mix local.hex --force
+  sudo_user: "{{ user_name }} -i"
+  sudo: yes
+
+- name: Install rebar
+  shell: mix local.rebar --force
+  sudo_user: "{{ user_name }} -i"
+  sudo: yes
+
+- name: Check if Goon is present
+  stat:
+    path: /usr/local/bin/goon
+  register: goon_present
+
+- name: Download Goon
+  get_url:
+    url: https://github.com/alco/goon/releases/download/v1.1.1/goon_linux_amd64.tar.gz
+    dest: /tmp/goon_linux_amd64.tar.gz
+  when: goon_present.stat.exists == False
+
+- name: Unpack Goon
+  command: tar -xvzf /tmp/goon_linux_amd64.tar.gz
+  args:
+    chdir: /tmp
+    creates: /tmp/goon
+  when: goon_present.stat.exists == False
+
+- name: Add Goon to PATH
+  sudo: yes
+  command: mv /tmp/goon /usr/local/bin
+  args:
+    creates: /usr/local/bin/goon
+    removes: /tmp/goon
+  when: goon_present.stat.exists == False
