@@ -1,0 +1,51 @@
+- name: Register extractor local commit hash
+  local_action:
+    shell
+    chdir={{local_extractor_dir}}
+    git rev-parse --short HEAD
+  register: local_commit_hash
+
+- name: Delete build directory
+  file:
+    path: "{{build_dir}}"
+    state: absent
+
+- name: Clone extractor
+  git:
+    repo: https://github.com/ijunaid8989/extractor
+    dest: "{{build_dir}}/"
+    version: "{{local_commit_hash.stdout}}"
+
+- name: Get extractor dependencies
+  shell: "bash -lc '{{mix_env_vars}} {{extractor_env_vars}} mix deps.get'"
+  args:
+    chdir: "{{build_dir}}"
+
+- name: Compile extractor application
+  shell: "bash -lc '{{mix_env_vars}} {{extractor_env_vars}} mix compile'"
+  args:
+    chdir: "{{build_dir}}"
+  failed_when: False
+
+- name: Compile again so any flaky dependencies are recompiled
+  shell: "bash -lc '{{mix_env_vars}} {{extractor_env_vars}} mix compile'"
+  args:
+    chdir: "{{build_dir}}"
+
+- name: Build extractor application release
+  shell: "bash -lc '{{mix_env_vars}} {{extractor_env_vars}} mix release'"
+  args:
+    chdir: "{{build_dir}}"
+
+- name: Register the version of the release
+  shell: "cat {{build_dir}}/rel/extractor/releases/start_erl.data | awk '{print $2}'"
+  register: extractor_version
+
+- name: Ensure there is a directory for the application
+  file: path="{{remote_extractor_dir}}" state=directory
+
+- name: Copy the release to the application directory
+  unarchive:
+    copy: no
+    src: "{{build_dir}}/rel/extractor/releases/{{extractor_version.stdout}}/extractor.tar.gz"
+    dest: "{{remote_extractor_dir}}"

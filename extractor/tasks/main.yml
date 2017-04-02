@@ -1,0 +1,17 @@
+- include: setup.yml
+  tags: configure
+
+- include: deploy.yml
+  tags: deploy
+
+- name: Stop extractor
+  shell: stop extractor
+  sudo: yes
+  failed_when: False
+  tags: deploy
+
+- name: Start extractor
+  shell: start extractor
+  sudo: yes
+  failed_when: False
+  tags: deploy

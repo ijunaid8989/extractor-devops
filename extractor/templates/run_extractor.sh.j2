@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if ! (ps aux | grep extractor/bin/extractor | grep -v grep > /dev/null); then
+    /opt/extractor/bin/extractor start
+fi

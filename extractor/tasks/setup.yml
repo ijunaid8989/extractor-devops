@@ -1,0 +1,30 @@
+- name: Ensure remote extractor dir exists
+  file:
+    path: "{{remote_extractor_dir}}"
+    state: directory
+    owner: "{{ansible_ssh_user}}"
+  sudo: yes
+
+- name: Ensure /usr/local/bin dir exists
+  file:
+    path: /usr/local/bin
+    state: directory
+  sudo: yes
+
+- name: Copy extractor run init script
+  sudo: yes
+  template:
+    src: run_extractor.sh.j2
+    dest: /usr/local/bin/run_extractor.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install the extractor init script
+  sudo: yes
+  template:
+    src: extractor.conf.j2
+    dest: /etc/init/extractor.conf
+    owner: root
+    group: root
+    mode: 0755
