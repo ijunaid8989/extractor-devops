@@ -1,0 +1,18 @@
+build_dir: /tmp/build-extractor
+remote_extractor_dir: /opt/extractor
+local_extractor_dir: ~/evercam/extractor
+version_to_deploy: "{{VERSION|default('master')}}"
+
+storage_dir: /storage
+
+extractor_env_vars: "{% for key, value in env_vars.items() %}{{key.upper()}}={{value}} {% endfor %}"
+mix_env_vars: "MIX_ENV=prod PORT=4000"
+
+sumocollector_installer_download: https://collectors.eu.sumologic.com/rest/download/deb/64
+sumologic_collector_accessid: "{{sumo_logic_id}}"
+sumologic_collector_accesskey: "{{sumo_logic_key}}"
+sumologic_collector_application_log_path:
+  - name: "extractor"
+    path: "/opt/extractor/log/erlang.log.*"
+    use_multiline: false
+    category: "extractor"

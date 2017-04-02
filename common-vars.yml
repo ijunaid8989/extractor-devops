@@ -1,0 +1,33 @@
+ansible_distribution_release: "trusty"
+
+nginx_pid: "/var/run/nginx.pid"
+nginx_source_version: "1.7.10"
+nginx_source_url: "http://nginx.org/download/nginx-{{nginx_source_version}}.tar.gz"
+nginx_rtmp_version: "1.1.6"
+nginx_rtmp_url: "https://github.com/arut/nginx-rtmp-module/archive/v{{nginx_rtmp_version}}.tar.gz"
+nginx_more_headers_version: "0.25"
+nginx_more_headers_url: "https://github.com/openresty/headers-more-nginx-module/archive/v{{nginx_more_headers_version}}.tar.gz"
+
+postgresql_version: 9.4
+postgresql_ext_postgis_version: 2.1
+postgresql_ext_install_postgis: yes
+postgresql_ext_install_contrib: yes
+postgresql_ssl: on
+
+ulimit_config:
+  - domain: '*'
+    type: soft
+    item: nofile
+    value: 2000000
+  - domain: '*'
+    type: hard
+    item: nofile
+    value: 2000000
+  - domain: 'root'
+    type: soft
+    item: nofile
+    value: 2000000
+  - domain: 'root'
+    type: hard
+    item: nofile
+    value: 2000000

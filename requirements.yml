@@ -1,0 +1,6 @@
+- src: ANXS.postgresql
+- src: DavidWittman.redis
+- src: geerlingguy.memcached
+- src: ohr486.elixir
+- src: jtyr.ulimit
+- src: wgregorian.sumocollector

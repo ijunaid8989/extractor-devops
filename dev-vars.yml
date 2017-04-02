@@ -1,0 +1,20 @@
+evercam_dash_dir: /vagrant/evercam-dashboard
+evercam_media_dir: /vagrant/evercam-media
+
+postgresql_version: 9.4
+postgresql_ext_postgis_version: 2.1
+postgresql_ext_install_postgis: yes
+postgresql_ext_install_contrib: yes
+postgresql_databases:
+  - name: evercam_dev
+    hstore: yes
+  - name: evercam_tst
+    hstore: yes
+postgresql_users:
+  - name: "{{ user_name }}"
+    pass: "{{ user_name }}"
+postgresql_user_privileges:
+  - name: "{{ user_name }}"
+    db: evercam_dev
+    priv: "ALL"
+    role_attr_flags: "Superuser"

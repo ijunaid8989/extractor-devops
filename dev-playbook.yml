@@ -1,0 +1,19 @@
+- hosts: all
+  sudo: yes
+  vars_files:
+    - common-vars.yml
+    - dev-vars.yml
+  vars:
+    - production: False
+    - user_name: "{{ansible_ssh_user}}"
+  roles:
+    - { role: deps }
+    - { role: elixir }
+    - { role: ruby }
+    - { role: node }
+    - { role: ffmpeg }
+    - { role: nginx }
+    - { role: ANXS.postgresql }
+    - { role: DavidWittman.redis }
+    - { role: geerlingguy.memcached }
+    - { role: evercam }

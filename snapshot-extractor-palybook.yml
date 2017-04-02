@@ -1,0 +1,19 @@
+- hosts: "{{target}}"
+  user: "{{ansible_ssh_user}}"
+  vars_files:
+    - common-vars.yml
+    - se-vars.yml
+    - ../private_vars_extractor.yml
+  vars:
+    - production: True
+    - user_name: "{{ansible_ssh_user}}"
+  roles:
+    # - { role: deps, tags: configure }
+    # - { role: wgregorian.sumocollector, tags: configure, sudo: yes }
+    # - { role: jtyr.ulimit, tags: configure, sudo: yes }
+    # - { role: ANXS.postgresql, tags: configure, sudo: yes }
+    # - { role: monitoring, tags: configure }
+    # - { role: ffmpeg, tags: configure, sudo: yes }
+    - { role: nginx, tags: configure }
+    # - { role: elixir, tags: configure }
+    # - { role: extractor, tags: extractor }
