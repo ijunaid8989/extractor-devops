@@ -1,0 +1,42 @@
+- name: Make sure the Nginx build dependencies are installed
+  sudo: yes
+  apt:
+    pkg: "{{item}}"
+    state: present
+  with_items:
+    - build-essential
+    - libpcre3
+    - libpcre3-dev
+    - libssl-dev
+
+- name: Check nginx version
+  shell: /usr/local/nginx/sbin/nginx -v 2>&1 | sed -e 's#^.*/##'
+  register: nginx_register_version
+  changed_when: False
+
+- name: Define nginx version
+  set_fact:
+    nginx_version: '{{ nginx_register_version.stdout | default("0.0") }}'
+
+- include: install.yml
+  when: nginx_version != nginx_source_version
+
+- name: Check if SSL certificates are present on the server
+  stat:
+    path: /etc/ssl/extractor_evercam_io.pem
+  register: ssl_cert
+
+- include: ssl_certs.yml
+  when: ssl_cert.stat.exists == False
+- include: config.yml
+  sudo: yes
+
+- include: firewall.yml
+  sudo: yes
+  when: production == True
+
+- name: Ensure Nginx is running
+  service:
+    name: nginx
+    state: started
+  sudo: yes

@@ -1,0 +1,57 @@
+- name: Download the Nginx source release
+  get_url:
+    url: "{{nginx_source_url}}"
+    dest: "/tmp/nginx-{{nginx_source_version}}.tar.gz"
+
+- name: Unpack the compressed Nginx source
+  command: "tar -xvzf /tmp/nginx-{{nginx_source_version}}.tar.gz"
+  args:
+    creates: "/tmp/nginx-{{nginx_source_version}}/README"
+    chdir: /tmp
+
+- name: Download the Nginx-RTMP source release
+  get_url:
+    url: "{{nginx_rtmp_url}}"
+    dest: "/tmp/nginx-rtmp-{{nginx_rtmp_version}}.tar.gz"
+
+- name: Unpack the compressed Nginx-RTMP source
+  command: "tar -xvzf /tmp/nginx-rtmp-{{nginx_rtmp_version}}.tar.gz"
+  args:
+    creates: "/tmp/nginx-rtmp-{{nginx_rtmp_version}}/README"
+    chdir: /tmp
+
+- name: Download the Nginx More Headers source release
+  get_url:
+    url: "{{nginx_more_headers_url}}"
+    dest: "/tmp/nginx-more-headers-{{nginx_more_headers_version}}.tar.gz"
+
+- name: Unpack the compressed Nginx More Headers source
+  command: "tar -xvzf /tmp/nginx-more-headers-{{nginx_more_headers_version}}.tar.gz"
+  args:
+    creates: "/tmp/headers-more-nginx-module-{{nginx_more_headers_version}}/README"
+    chdir: /tmp
+
+- name: Compile the Nginx source
+  shell: >
+    cd /tmp/nginx-{{nginx_source_version}} &&
+    ./configure --add-module=/tmp/nginx-rtmp-module-{{nginx_rtmp_version}} --add-module=/tmp/headers-more-nginx-module-{{nginx_more_headers_version}} --with-http_ssl_module &&
+    make -j {{ansible_processor_cores}} &&
+    make install
+  sudo: yes
+
+- name: Install the upstart init script
+  sudo: yes
+  template:
+    src: nginx.init.j2
+    dest: /etc/init.d/nginx
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - restart nginx
+
+- name: Register Nginx as a service
+  sudo: yes
+  service:
+    name: nginx
+    enabled: yes

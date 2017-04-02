@@ -1,0 +1,9 @@
+- name: Update Nginx configuration
+  template: 
+    src: nginx.conf.j2
+    dest: /usr/local/nginx/conf/nginx.conf
+
+- name: Check Nginx configuration
+  shell: /usr/local/nginx/sbin/nginx -t
+  notify:
+    - reload nginx
