@@ -1,0 +1,28 @@
+- name: Register New Relic repository.
+  get_url:
+    url: http://download.newrelic.com/debian/newrelic.list
+    dest: /etc/apt/sources.list.d/newrelic.list
+  sudo: yes
+
+- name: Download New Relic repo key.
+  apt_key:
+    url: http://download.newrelic.com/548C16BF.gpg
+  sudo: yes
+
+- name: Install New Relic.
+  apt:
+    pkg: newrelic-sysmond
+    update_cache: yes
+  failed_when: false
+  sudo: yes
+
+- name: Configure New Relic with license key.
+  shell: "nrsysmond-config --set license_key={{new_relic_key}}"
+  sudo: yes
+
+- name: Start New Relic.
+  service:
+    name: newrelic-sysmond
+    state: started
+  sudo: yes
+

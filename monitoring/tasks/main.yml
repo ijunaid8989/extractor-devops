@@ -1,0 +1,2 @@
+- include: new_relic.yml
+  when: production == True
