@@ -1,0 +1,17 @@
+- name: Add FFMPEG repository
+  apt_repository:
+    repo: 'ppa:mc3man/trusty-media'
+    state: present
+  failed_when: false
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  sudo: yes
+
+- name: Install dependencies
+  apt:
+    pkg: "{{item}}"
+    state: latest
+  with_items:
+    - ffmpeg
